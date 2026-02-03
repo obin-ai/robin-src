@@ -47,6 +47,7 @@ type ThemeColors = {
   primary: RGBA
   secondary: RGBA
   accent: RGBA
+  logo: RGBA
   error: RGBA
   warning: RGBA
   success: RGBA
@@ -131,9 +132,10 @@ type ColorValue = HexColor | RefName | Variant | RGBA
 type ThemeJson = {
   $schema?: string
   defs?: Record<string, HexColor | RefName>
-  theme: Omit<Record<keyof ThemeColors, ColorValue>, "selectedListItemText" | "backgroundMenu"> & {
+  theme: Omit<Record<keyof ThemeColors, ColorValue>, "selectedListItemText" | "backgroundMenu" | "logo"> & {
     selectedListItemText?: ColorValue
     backgroundMenu?: ColorValue
+    logo?: ColorValue
     thinkingOpacity?: number
   }
 }
@@ -220,6 +222,13 @@ function resolveTheme(theme: ThemeJson, mode: "dark" | "light") {
     resolved.backgroundMenu = resolveColor(theme.theme.backgroundMenu)
   } else {
     resolved.backgroundMenu = resolved.backgroundElement
+  }
+
+  // Handle logo - optional with fallback to light blue/cyan for ROBIN branding
+  if (theme.theme.logo !== undefined) {
+    resolved.logo = resolveColor(theme.theme.logo)
+  } else {
+    resolved.logo = RGBA.fromHex("#66D9EF")  // Light blue/cyan
   }
 
   // Handle thinkingOpacity - optional with default of 0.6
@@ -467,6 +476,7 @@ function generateSystem(colors: TerminalColors, mode: "dark" | "light"): ThemeJs
       primary: ansiColors.cyan,
       secondary: ansiColors.magenta,
       accent: ansiColors.cyan,
+      logo: RGBA.fromHex("#66D9EF"),  // Light blue/cyan for ROBIN branding
 
       // Status colors using ANSI
       error: ansiColors.red,

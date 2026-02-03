@@ -8,9 +8,9 @@ import { useTheme, tint } from "@tui/context/theme"
 // ~ = shadow top only (▀ with fg=shadow)
 const SHADOW_MARKER = /[_^~]/
 
-const LOGO_LEFT = [`                   `, `█▀▀█ █▀▀█ █▀▀█ █▀▀▄`, `█__█ █__█ █^^^ █__█`, `▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀~~▀`]
+const LOGO_LEFT = [`    `, `█▀▀█`, `█▀▀▄`, `▀~~▀`]  // R
 
-const LOGO_RIGHT = [`             ▄     `, `█▀▀▀ █▀▀█ █▀▀█ █▀▀█`, `█___ █__█ █__█ █^^^`, `▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀`]
+const LOGO_RIGHT = [`                `, `█▀▀█ █▀▀▄ ▀ █▀▀▄`, `█__█ █▀▀█ █ █__█`, `▀▀▀▀ ▀▀▀▀ ▀ ▀~~▀`]  // OBiN
 
 export function Logo() {
   const { theme } = useTheme()
@@ -79,7 +79,7 @@ export function Logo() {
         {(line, index) => (
           <box flexDirection="row" gap={1}>
             <box flexDirection="row">{renderLine(line, theme.textMuted, false)}</box>
-            <box flexDirection="row">{renderLine(LOGO_RIGHT[index()], theme.text, true)}</box>
+            <box flexDirection="row">{renderLine(LOGO_RIGHT[index()], theme.logo, true)}</box>
           </box>
         )}
       </For>
