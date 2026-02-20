@@ -25,6 +25,8 @@ import { Flag } from "@/flag/flag"
 import { Log } from "@/util/log"
 import { LspTool } from "./lsp"
 import { Truncate } from "./truncation"
+import { Bus } from "@/bus"
+import { WorkspaceEvent } from "@/workspace/event"
 import { PlanExitTool, PlanEnterTool } from "./plan"
 import { ApplyPatchTool } from "./apply_patch"
 
@@ -68,6 +70,15 @@ export namespace ToolRegistry {
         description: def.description,
         execute: async (args, ctx) => {
           const result = await def.execute(args as any, ctx)
+          // Emit workspace events if tool opted in
+          try {
+            const parsed = JSON.parse(result)
+            if (parsed.__workspace_event) {
+              Bus.publish(WorkspaceEvent.Updated, parsed.__workspace_event)
+            }
+          } catch {
+            // Non-JSON output or no workspace event, skip
+          }
           const out = await Truncate.output(result, {}, initCtx?.agent)
           return {
             title: "",

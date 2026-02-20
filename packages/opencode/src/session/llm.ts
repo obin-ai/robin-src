@@ -24,6 +24,7 @@ import { SystemPrompt } from "./system"
 import { Flag } from "@/flag/flag"
 import { PermissionNext } from "@/permission/next"
 import { Auth } from "@/auth"
+import { Telemetry } from "@/telemetry"
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -63,6 +64,7 @@ export namespace LLM {
       Provider.getProvider(input.model.providerID),
       Auth.get(input.model.providerID),
     ])
+    Telemetry.init(cfg.experimental?.openTelemetry)
     const isCodex = provider.id === "openai" && auth?.type === "oauth"
 
     const system = SystemPrompt.header(input.model.providerID)
@@ -251,7 +253,16 @@ export namespace LLM {
           extractReasoningMiddleware({ tagName: "think", startWithReasoning: false }),
         ],
       }),
-      experimental_telemetry: { isEnabled: cfg.experimental?.openTelemetry },
+      experimental_telemetry: {
+        isEnabled: cfg.experimental?.openTelemetry,
+        functionId: `session/${input.sessionID}`,
+        metadata: {
+          sessionId: input.sessionID,
+          modelId: input.model.id,
+          providerID: input.model.providerID,
+          evalScenarioId: process.env.EVAL_SCENARIO_ID ?? "",
+        },
+      },
     })
   }
 
