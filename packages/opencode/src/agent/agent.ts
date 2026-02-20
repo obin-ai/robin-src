@@ -276,7 +276,7 @@ export namespace Agent {
 
   export async function generate(input: { description: string; model?: { providerID: string; modelID: string } }) {
     const cfg = await Config.get()
-    Telemetry.init(cfg.experimental?.openTelemetry)
+    await Telemetry.init(cfg.experimental?.openTelemetry)
     const defaultModel = input.model ?? (await Provider.defaultModel())
     const model = await Provider.getModel(defaultModel.providerID, defaultModel.modelID)
     const language = await Provider.getLanguage(model)

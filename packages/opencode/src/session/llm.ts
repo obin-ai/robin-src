@@ -64,7 +64,7 @@ export namespace LLM {
       Provider.getProvider(input.model.providerID),
       Auth.get(input.model.providerID),
     ])
-    Telemetry.init(cfg.experimental?.openTelemetry)
+    await Telemetry.init(cfg.experimental?.openTelemetry)
     const isCodex = provider.id === "openai" && auth?.type === "oauth"
 
     const system = SystemPrompt.header(input.model.providerID)
