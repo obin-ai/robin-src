@@ -5,9 +5,10 @@ import { Instance } from "../../project/instance"
 import { lazy } from "../../util/lazy"
 import { Bus } from "@/bus"
 import { WorkspaceEvent } from "@/workspace/event"
+import { File } from "@/file"
 import fs from "fs"
 import path from "path"
-import { readdir, mkdir } from "fs/promises"
+import { readdir, mkdir, rm } from "fs/promises"
 
 const FileInfo = z.object({
   name: z.string(),
@@ -167,6 +168,50 @@ export const WorkspaceRoutes = lazy(() =>
           name: filename,
           size: stat.size,
         })
+      },
+    )
+    .delete(
+      "/file",
+      describeRoute({
+        summary: "Delete workspace file",
+        description: "Delete a file from the workspace by path.",
+        operationId: "workspace.deleteFile",
+        responses: {
+          200: {
+            description: "File deleted",
+            content: {
+              "application/json": {
+                schema: resolver(z.object({ deleted: z.string() })),
+              },
+            },
+          },
+          400: {
+            description: "Invalid path",
+          },
+          404: {
+            description: "File not found",
+          },
+        },
+      }),
+      validator(
+        "query",
+        z.object({
+          path: z.string(),
+        }),
+      ),
+      async (c) => {
+        const filePath = c.req.valid("query").path
+        const normalized = path.resolve(filePath)
+        if (!normalized.startsWith(Instance.directory)) {
+          return c.json({ error: "Path outside workspace" }, 400)
+        }
+        const file = Bun.file(normalized)
+        if (!(await file.exists())) {
+          return c.json({ error: "File not found" }, 404)
+        }
+        await rm(normalized)
+        Bus.publish(File.Event.Edited, { file: normalized })
+        return c.json({ deleted: normalized })
       },
     ),
 )
