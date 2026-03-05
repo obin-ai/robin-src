@@ -1,7 +1,11 @@
 import { Hono } from "hono"
 import { describeRoute, validator, resolver } from "hono-openapi"
 import z from "zod"
+import path from "path"
+import fs from "fs"
+import { Bus } from "../../bus"
 import { File } from "../../file"
+import { FileTime } from "../../file/time"
 import { Ripgrep } from "../../file/ripgrep"
 import { LSP } from "../../lsp"
 import { Instance } from "../../project/instance"
@@ -170,6 +174,63 @@ export const FileRoutes = lazy(() =>
         const path = c.req.valid("query").path
         const content = await File.read(path)
         return c.json(content)
+      },
+    )
+    .put(
+      "/file/content",
+      describeRoute({
+        summary: "Write file",
+        description: "Write content to a file in the workspace.",
+        operationId: "file.write",
+        responses: {
+          200: {
+            description: "Updated file content",
+            content: {
+              "application/json": {
+                schema: resolver(File.Content),
+              },
+            },
+          },
+          400: { description: "Invalid path" },
+          409: { description: "File modified since last read (etag mismatch)" },
+        },
+      }),
+      validator(
+        "json",
+        z.object({
+          path: z.string(),
+          content: z.string(),
+          etag: z.string().optional(),
+        }),
+      ),
+      async (c) => {
+        const { path: filePath, content, etag } = c.req.valid("json")
+        const full = path.isAbsolute(filePath) ? filePath : path.join(Instance.directory, filePath)
+
+        if (!Instance.containsPath(full)) {
+          return c.json({ error: "Access denied: path escapes project directory" }, 400)
+        }
+
+        if (etag) {
+          const file = Bun.file(full)
+          if (await file.exists()) {
+            const stats = await file.stat()
+            const currentEtag = String(stats.mtime.getTime())
+            if (currentEtag !== etag) {
+              return c.json({ error: "File modified since last read" }, 409)
+            }
+          }
+        }
+
+        const relative = path.relative(Instance.directory, full)
+        const result = await FileTime.withLock(full, async () => {
+          await fs.promises.mkdir(path.dirname(full), { recursive: true })
+          await Bun.write(full, content)
+          await Bus.publish(File.Event.Edited, { file: full })
+          return File.read(relative)
+        })
+
+        return c.json(result)
       },
     )
     .get(
