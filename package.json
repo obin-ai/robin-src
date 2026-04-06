@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@actions/artifact": "5.0.1",
+    "@google-cloud/storage": "7.19.0",
     "@tsconfig/bun": "catalog:",
     "husky": "9.1.7",
     "prettier": "3.6.2",

@@ -1,0 +1,24 @@
+Process large documents or multi-file datasets using a persistent Python REPL with sub-LLM calls.
+
+USE THIS TOOL WHEN:
+- Working with files larger than 100K characters
+- Working with 3+ files that need cross-document analysis
+- Questions requiring counting, aggregation, or computation across documents
+- Questions requiring comparison between document versions
+- The user mentions "deal room", "documents", or "extract from all files"
+
+DO NOT USE when a simple read/grep/bash can answer the question directly.
+
+The REPL provides:
+- `context` — document text loaded via context_file parameter
+- `context_store.store(key, data) -> ptr` — store data as pointer (LLM never sees raw data)
+- `context_store.load(ptr) -> str` — load data by pointer
+- `context_store.chunk(ptr, size) -> [ptrs]` — split into chunk pointers
+- `context_store.describe(ptr) -> str` — preview a pointer
+- `llm_query(prompt) -> str` — sub-LLM call with fresh context window
+- `llm_batch(prompts) -> [str]` — parallel sub-LLM calls
+- `answer` dict — set answer["content"] and answer["ready"] = True to finish
+- `FINAL(value)` — terminate immediately
+- Python: json, re, math, collections, itertools, functools
+
+Strategy: Load file → store as pointers → chunk large data → llm_batch for parallel processing → aggregate with Python → set answer.

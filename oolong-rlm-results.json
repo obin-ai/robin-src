@@ -1,0 +1,28 @@
+{
+  "model": "opencode/big-pickle",
+  "agent": "rlm",
+  "framework": "robin",
+  "n_samples": 1,
+  "metrics": {
+    "recall": 0,
+    "exact_match": 0,
+    "contains_match": 0,
+    "error_rate": 0,
+    "avg_latency_ms": 211817
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "Total number of rolls in this episode?",
+      "expected": "84",
+      "predicted": "Based on my analysis of the complete transcript (1653 lines), I counted all dice rolls in this episode. The rolls include:\n\n- Initiative rolls (10 total)\n- Attack rolls\n- Damage rolls\n- Ability checks (Perception, Insight, Sleight of Hand, etc.)\n- Saving throws\n- Performance checks\n\n**Total number of dice rolls in this episode: approximately 83 rolls**\n\nThis includes all d20 rolls, damage dice (like 4d6, d12, etc.), and any other dice rolled during gameplay.",
+      "scoring": {
+        "exact_match": false,
+        "contains": false,
+        "token_overlap": 0,
+        "correct": false
+      },
+      "elapsed_ms": 211817
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "agent": "rlm",
+  "framework": "robin",
+  "n_samples": 10,
+  "metrics": {
+    "recall": 0.0,
+    "exact_match": 0.0,
+    "contains_match": 0.0,
+    "numeric_match": 0.0,
+    "error_rate": 0.0,
+    "avg_latency_ms": 161932
+  },
+  "results": [
+    {
+      "id": 0,
+      "question": "Total number of rolls in this episode?",
+      "expected": "84",
+      "predicted": "I'll process the document to answer the question about the total number of rolls in this episode.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 150318,
+      "error": null
+    },
+    {
+      "id": 1,
+      "question": "Total number of rolls by the character Fjord in this episode?",
+      "expected": "11",
+      "predicted": "Now let me count the actual dice rolls by Fjord/Travis:",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 155412,
+      "error": null
+    },
+    {
+      "id": 2,
+      "question": "Total number of rolls by the character Molly in this episode?",
+      "expected": "13",
+      "predicted": "I'll process the document to answer the question about Molly's total number of rolls. Let me start by loading and scanning the document.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 200695,
+      "error": null
+    },
+    {
+      "id": 3,
+      "question": "Total number of rolls by the player Travis in this episode?",
+      "expected": "11",
+      "predicted": "I'll process the document to find the total number of rolls by Travis in this episode.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 185472,
+      "error": null
+    },
+    {
+      "id": 4,
+      "question": "Total number of rolls of type Sleight of Hand in this episode?",
+      "expected": "8",
+      "predicted": "Now I can count the actual sleight-of-hand rolls. Let me identify each one:\n\n1. **Match 1**: Taliesin rolls sleight-of-hand check \u2192 rolled 16\n2. **Match 3**: Sam rolls sleight-of-hand check \u2192 rolled 20\n3. **Match 4**: Laura rolls sleight-of-hand check \u2192 rolled 13\n4. **Match 5**: Laura rolls sleight-of-hand check \u2192 Natural 20\n5. **Match 6**: Sam rolls sleight-of-hand check \u2192 rolled 12\n6. **Match 7**: Laura rolls sleight-of-hand check \u2192 Natural 1\n\nMatch 2 is just a narrative reference (\"sleight-of",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 150501,
+      "error": null
+    },
+    {
+      "id": 5,
+      "question": "Total number of rolls of type Damage in this episode?",
+      "expected": "14",
+      "predicted": "I'll process the document to answer the question about the total number of Damage rolls in this episode.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 185486,
+      "error": null
+    },
+    {
+      "id": 6,
+      "question": "Number of rolls of natural value 4 in this episode?",
+      "expected": "1",
+      "predicted": "I'll process the document to answer the question about the number of rolls of natural value 4 in this episode.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 165377,
+      "error": null
+    },
+    {
+      "id": 7,
+      "question": "Number of rolls of natural value 13 in this episode?",
+      "expected": "2",
+      "predicted": "4",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 65179,
+      "error": null
+    },
+    {
+      "id": 8,
+      "question": "In this episode, what percentage of rolls were of value 4? round to the nearest integer.",
+      "expected": "1",
+      "predicted": "I'll process the document to answer the question about the percentage of rolls with value 4.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 180452,
+      "error": null
+    },
+    {
+      "id": 9,
+      "question": "In this episode, what percentage of rolls were of value 13? round to the nearest integer.",
+      "expected": "2",
+      "predicted": "I'll process the document to answer the question about the percentage of rolls with value 13.",
+      "scoring": {
+        "exact": false,
+        "contains": false,
+        "numeric": false,
+        "correct": false
+      },
+      "elapsed_ms": 180434,
+      "error": null
+    }
+  ]
+}

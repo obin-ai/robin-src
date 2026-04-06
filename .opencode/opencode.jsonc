@@ -9,6 +9,12 @@
     "opencode": {
       "options": {},
     },
+    "google-vertex-anthropic": {
+      "options": {
+        "project": "alpha-dev-480116",
+        "location": "us-east5",
+      },
+    },
   },
   "mcp": {
     "context7": {
@@ -21,6 +27,6 @@
     "github-pr-search": false,
   },
   "experimental": {
-    "openTelemetry": true,
+    "openTelemetry": false,
   },
 }
