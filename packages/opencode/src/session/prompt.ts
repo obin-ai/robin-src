@@ -507,6 +507,99 @@ export namespace SessionPrompt {
         continue
       }
 
+      // Smart auto-routing to @rlm for document-heavy tasks
+      if (lastUser.agent === "build" && step === 1) {
+        const userParts = msgs
+          .filter((m) => m.info.id === lastUser!.id)
+          .flatMap((m) => m.parts)
+        const userText = userParts
+          .filter((p): p is MessageV2.TextPart => p.type === "text")
+          .map((p) => p.text)
+          .join(" ")
+          .toLowerCase()
+
+        let rlmScore = 0
+        const reasons: string[] = []
+
+        // 1. Document/deal room keywords (strong signal)
+        const strongTriggers = ["deal room", "deal documents", "across all documents", "across all files", "every document", "all the files", "entire deal"]
+        if (strongTriggers.some((t) => userText.includes(t))) {
+          rlmScore += 3
+          reasons.push("deal_room_keywords")
+        }
+
+        // 2. Multi-document analysis intent (medium signal)
+        const analysisTriggers = ["compare across", "extract from all", "multiple files", "multi-file", "cross-document", "between versions", "all versions", "every version", "across the"]
+        if (analysisTriggers.some((t) => userText.includes(t))) {
+          rlmScore += 2
+          reasons.push("cross_doc_intent")
+        }
+
+        // 3. Financial document terms (weak signal, adds up)
+        const finTerms = ["pricing model", "term sheet", "proposal", "concept memo", "facility", "covenant", "borrower", "lender", "mezz", "revolver", "warrant", "pik rate", "exit fee"]
+        const finMatches = finTerms.filter((t) => userText.includes(t))
+        if (finMatches.length >= 2) {
+          rlmScore += 2
+          reasons.push(`financial_terms(${finMatches.length})`)
+        } else if (finMatches.length === 1) {
+          rlmScore += 1
+          reasons.push(`financial_term`)
+        }
+
+        // 4. Referenced file is large (>100K)
+        const filePathMatch = userText.match(/(?:\/[\w\-./]+\.\w+)/g)
+        if (filePathMatch) {
+          for (const fp of filePathMatch) {
+            try {
+              if (await Bun.file(fp).exists()) {
+                const size = Bun.file(fp).size
+                if (size > 100_000) {
+                  rlmScore += 3
+                  reasons.push(`large_file(${(size / 1000).toFixed(0)}K)`)
+                  break
+                }
+              }
+            } catch {}
+          }
+        }
+
+        // 5. Referenced directory has multiple files
+        if (filePathMatch) {
+          for (const fp of filePathMatch) {
+            const dirPath = fp.replace(/\/[^/]+$/, "")
+            try {
+              const glob = new Bun.Glob("*.{pdf,xlsx,xlsm,docx,csv,txt}")
+              let fileCount = 0
+              for await (const _ of glob.scan({ cwd: dirPath })) {
+                fileCount++
+                if (fileCount >= 3) break
+              }
+              if (fileCount >= 3) {
+                rlmScore += 3
+                reasons.push(`multi_file_dir(${fileCount}+)`)
+                break
+              }
+            } catch {}
+          }
+        }
+
+        // 6. Attached files in the message (uploaded documents)
+        const fileParts = userParts.filter((p) => p.type === "file")
+        if (fileParts.length >= 3) {
+          rlmScore += 3
+          reasons.push(`attached_files(${fileParts.length})`)
+        } else if (fileParts.length >= 1) {
+          rlmScore += 1
+          reasons.push(`attached_file`)
+        }
+
+        // Route to @rlm if score >= 3 (at least one strong signal or multiple weak ones)
+        if (rlmScore >= 3) {
+          log.info("auto-routing to @rlm", { score: rlmScore, reasons, sessionID })
+          lastUser = { ...lastUser, agent: "rlm" }
+        }
+      }
+
       // normal processing
       const agent = await Agent.get(lastUser.agent)
       const maxSteps = agent.steps ?? Infinity
