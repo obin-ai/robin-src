@@ -689,7 +689,14 @@ export namespace SessionPrompt {
       { modelID: input.model.api.id, providerID: input.model.providerID },
       input.agent,
     )) {
-      const schema = ProviderTransform.schema(input.model, z.toJSONSchema(item.parameters))
+      // Handle both Zod schemas and plain JSON schemas
+      // Zod v4 has native toJSONSchema() method
+      const schema = ProviderTransform.schema(
+        input.model,
+        typeof (item.parameters as any)?.toJSONSchema === 'function'
+          ? (item.parameters as any).toJSONSchema()
+          : item.parameters
+      )
       tools[item.id] = tool({
         id: item.id as any,
         description: item.description,

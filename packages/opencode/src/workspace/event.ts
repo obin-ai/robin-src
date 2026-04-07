@@ -5,7 +5,7 @@ export namespace WorkspaceEvent {
   export const Updated = BusEvent.define(
     "workspace.updated",
     z.object({
-      type: z.enum(["cell_write", "cell_read", "recalculation", "file_added", "file_changed", "workbook_delta"]),
+      type: z.enum(["cell_write", "cell_read", "recalculation", "file_added", "file_changed", "workbook_delta", "chart_created", "canvas_created", "canvas_updated"]),
       file: z.string(),
       sheet: z.string().optional(),
       trigger: z.enum(["write", "read", "recalc", "sync"]).optional(),
@@ -38,6 +38,11 @@ export namespace WorkspaceEvent {
           }),
         )
         .optional(),
+      // Canvas/chart event fields
+      canvas_id: z.string().optional(),
+      id: z.string().optional(),
+      title: z.string().optional(),
+      html: z.string().optional(),
     }),
   )
 }

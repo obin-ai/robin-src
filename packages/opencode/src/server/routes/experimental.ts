@@ -6,7 +6,6 @@ import { Worktree } from "../../worktree"
 import { Instance } from "../../project/instance"
 import { Project } from "../../project/project"
 import { MCP } from "../../mcp"
-import { zodToJsonSchema } from "zod-to-json-schema"
 import { errors } from "../error"
 import { lazy } from "../../util/lazy"
 
@@ -81,7 +80,10 @@ export const ExperimentalRoutes = lazy(() =>
             id: t.id,
             description: t.description,
             // Handle both Zod schemas and plain JSON schemas
-            parameters: (t.parameters as any)?._def ? zodToJsonSchema(t.parameters as any) : t.parameters,
+            // Zod v4 has native toJSONSchema() method
+            parameters: typeof (t.parameters as any)?.toJSONSchema === 'function'
+              ? (t.parameters as any).toJSONSchema()
+              : t.parameters,
           })),
         )
       },
