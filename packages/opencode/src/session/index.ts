@@ -293,10 +293,16 @@ export namespace Session {
     z.object({
       sessionID: Identifier.schema("session"),
       limit: z.number().optional(),
+      // Cursor: return only messages with IDs strictly less than this.
+      // Combined with `limit`, enables paginating backward through history.
+      // Message IDs are monotonic ULID-like strings, so lexicographic
+      // comparison matches chronological order.
+      before: z.string().optional(),
     }),
     async (input) => {
       const result = [] as MessageV2.WithParts[]
       for await (const msg of MessageV2.stream(input.sessionID)) {
+        if (input.before && msg.info.id >= input.before) continue
         if (input.limit && result.length >= input.limit) break
         result.push(msg)
       }

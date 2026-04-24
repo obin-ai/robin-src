@@ -567,6 +567,10 @@ export const SessionRoutes = lazy(() =>
         "query",
         z.object({
           limit: z.coerce.number().optional(),
+          before: z
+            .string()
+            .optional()
+            .meta({ description: "Return messages with IDs strictly less than this cursor (paginate backward)" }),
         }),
       ),
       async (c) => {
@@ -574,6 +578,7 @@ export const SessionRoutes = lazy(() =>
         const messages = await Session.messages({
           sessionID: c.req.valid("param").sessionID,
           limit: query.limit,
+          before: query.before,
         })
         return c.json(messages)
       },
